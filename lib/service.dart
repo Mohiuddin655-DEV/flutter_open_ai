@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:dio/dio.dart';
+import 'package:flutter_open_ai/services/chat/service.dart';
 
 import 'requests/completion_request.dart';
 import 'responses/completion_response.dart';
@@ -126,6 +127,12 @@ class OpenAi {
     String baseUrl = "https://api.openai.com",
     String version = "v1",
   }) {
+    ChatAi.init(
+      apiKey: apiKey,
+      organizationKey: organizationKey,
+      baseUrl: baseUrl,
+      version: version,
+    );
     return _i ??= OpenAi._(
       baseUrl: baseUrl,
       version: version,
@@ -154,6 +161,30 @@ class OpenAi {
   }
 
   Future<CompletionResponse?> completion(CompletionRequest request) async {
+    try {
+      final response = await _dio.post(
+        "chat/completions",
+        data: request.source,
+      );
+
+      final code = response.statusCode;
+      if (code == 200) {
+        final data = response.data;
+        if (data is Map<String, dynamic>) {
+          return CompletionResponse.from(data);
+        } else {
+          return null;
+        }
+      } else {
+        return null;
+      }
+    } catch (_) {
+      return null;
+    }
+  }
+
+  Future<CompletionResponse?> completionWithImage(
+      CompletionRequest request) async {
     try {
       final response = await _dio.post(
         "chat/completions",

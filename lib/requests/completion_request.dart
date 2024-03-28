@@ -4,7 +4,7 @@ import '../enums/models.dart';
 
 class CompletionRequest {
   final String? model;
-  final List<Message>? messages;
+  final List<CompletionMessage>? messages;
   final double? temperature;
 
   const CompletionRequest({
@@ -22,11 +22,11 @@ class CompletionRequest {
   }
 }
 
-class Message {
+class CompletionMessage {
   final String? role;
   final String? content;
 
-  const Message({
+  const CompletionMessage({
     this.role,
     this.content,
   });

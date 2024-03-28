@@ -1,21 +1,32 @@
 import 'dart:developer';
+import 'dart:io';
 
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 
-import '../enums/models.dart';
 import '../services/chat/message.dart';
 import '../services/chat/service.dart';
 
-class CompletionWidget extends StatefulWidget {
-  const CompletionWidget({super.key});
+class ImageChatPage extends StatefulWidget {
+  const ImageChatPage({super.key});
 
   @override
-  State<CompletionWidget> createState() => _CompletionWidgetState();
+  State<ImageChatPage> createState() => _ImageChatPageState();
 }
 
-class _CompletionWidgetState extends State<CompletionWidget> {
-  final etInput = TextEditingController();
+class _ImageChatPageState extends State<ImageChatPage> {
   final etOutput = TextEditingController();
+
+  File? selectedFile;
+
+  Future<void> pickFile() async {
+    final result = await FilePicker.platform.pickFiles(allowMultiple: false);
+    if (result != null) {
+      setState(() {
+        selectedFile = File(result.files.single.path!);
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -27,9 +38,28 @@ class _CompletionWidgetState extends State<CompletionWidget> {
         ),
         child: Column(
           children: [
-            EditField(
-              controller: etInput,
-              hint: "Input",
+            GestureDetector(
+              onTap: pickFile,
+              child: Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
+                decoration: BoxDecoration(
+                  color: Theme.of(context).primaryColor.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(25),
+                ),
+                alignment: Alignment.center,
+                child: Text(
+                  selectedFile != null
+                      ? 'Selected file: ${selectedFile!.path.split('/').last}'
+                      : 'Choose file',
+                  style: TextStyle(
+                    fontSize: 16,
+                    color: Theme.of(context).primaryColor,
+                    fontWeight: FontWeight.bold,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ),
             ),
             const SizedBox(height: 24),
             EditField(
@@ -44,10 +74,18 @@ class _CompletionWidgetState extends State<CompletionWidget> {
               child: ElevatedButton(
                 onPressed: () {
                   ChatAi.i.completions(
-                    model: "gpt-3.5-turbo",
+                    model: "gpt-4-vision-preview",
                     messages: [
                       Message.user(
-                        content: Content.text(etInput.text),
+                        content: Content.array([
+                          SubContent.text("What’s in this image?"),
+                          SubContent.image(
+                            const ImageUrlContent(
+                              url:
+                                  "https://upload.wikimedia.org/wikipedia/commons/thumb/d/dd/Gfp-wisconsin-madison-the-nature-boardwalk.jpg/2560px-Gfp-wisconsin-madison-the-nature-boardwalk.jpg",
+                            ),
+                          ),
+                        ]),
                       ),
                     ],
                   ).then((value) {

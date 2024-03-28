@@ -1,12 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_open_ai/pages/audio_transcription_page.dart';
+import 'package:flutter_open_ai/pages/image_chat_page.dart';
 import 'package:flutter_open_ai/pages/text_to_audio_page.dart';
 
 import 'pages/completion_page.dart';
 import 'pages/model_page.dart';
 import 'service.dart';
+import 'services/chat/service.dart';
 
 void main() {
+  ChatAi.init(
+    apiKey: "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",
+    organizationKey: "org-LyamYliNXiW6NAF6Y9wSfGkl",
+  );
   OpenAi.init(
     apiKey: "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",
     organizationKey: "org-LyamYliNXiW6NAF6Y9wSfGkl",
@@ -37,7 +43,7 @@ class HomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
-      length: 6,
+      length: 7,
       child: Scaffold(
         backgroundColor: Colors.grey.shade200,
         appBar: AppBar(
@@ -71,6 +77,7 @@ class HomePage extends StatelessWidget {
             tabs: [
               Text("Models"),
               Text("Completion"),
+              Text("Completion with Image"),
               Text("Text to Audio"),
               Text("Transcription"),
               Text("Text to Image"),
@@ -82,6 +89,7 @@ class HomePage extends StatelessWidget {
           children: [
             ModelWidget(),
             CompletionWidget(),
+            ImageChatPage(),
             TextToAudioPage(),
             AudioTranscriptionPage(),
             CompletionWidget(),
